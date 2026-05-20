@@ -1,28 +1,29 @@
 package io.github.rikkakawaii0612.classtop;
 
+import io.github.rikkakawaii0612.classtop.model.AppConfig;
+import io.github.rikkakawaii0612.classtop.ui.ScheduleSettingsWindow;
+import io.github.rikkakawaii0612.classtop.ui.SettingsWindow;
+import io.github.rikkakawaii0612.classtop.util.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
-public class Main extends Application {
-
+public class MainApp extends Application {
     private SystemTrayManager trayManager;
     private ScheduleManager scheduleManager;
     private LogService logService;
     private AppConfig config;
-    private AutoStartManager autoStartManager;
 
     @Override
     public void start(Stage primaryStage) {
         // 初始化组件
-        config = AppConfig.loadConfig("./config.json");
-        logService = new LogService(config.getLogPath());
-        autoStartManager = new AutoStartManager();
+        config = AppConfig.loadConfig();
+        logService = new LogService(config.logPath);
 
         // 启动今日定时任务
         scheduleManager = new ScheduleManager();
-        scheduleManager.startTodaySchedule(config, logService);
+        scheduleManager.scheduleToday(config, logService);
+        config.subscribeOnSaved(config -> scheduleManager.scheduleToday(config, logService));
 
         // 系统托盘（使程序常驻）
         trayManager = new SystemTrayManager();
@@ -32,11 +33,17 @@ public class Main extends Application {
         primaryStage.hide();
     }
 
-    // 由托盘调用的设置窗口
+    public void showSchedules() {
+        Platform.runLater(() -> {
+            ScheduleSettingsWindow window = new ScheduleSettingsWindow(config);
+            window.show();
+        });
+    }
+
     public void showSettings() {
         Platform.runLater(() -> {
-            SettingsWindow settings = new SettingsWindow(autoStartManager, config);
-            settings.show();
+            SettingsWindow window = new SettingsWindow(config);
+            window.show();
         });
     }
 
