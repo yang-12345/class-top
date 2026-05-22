@@ -39,16 +39,7 @@ public class SystemTrayManager {
         trayIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {   // 右键点击（不同平台触发方式略有差异）
-                    Platform.runLater(() -> showCustomMenu(e.getX(), e.getY()));
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    Platform.runLater(() -> showCustomMenu(e.getX(), e.getY()));
-                }
+                Platform.runLater(() -> showCustomMenu(e.getX(), e.getY()));
             }
         });
 

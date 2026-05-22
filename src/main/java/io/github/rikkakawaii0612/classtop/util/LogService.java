@@ -2,6 +2,7 @@ package io.github.rikkakawaii0612.classtop.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.rikkakawaii0612.classtop.model.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ public class LogService {
     private final Path logDir;
 
     public LogService(String logDirPath) {
-        this.logDir = Paths.get(logDirPath);
+        this.logDir = AppConfig.getAppDirectory().resolve(logDirPath);
         try {
             Files.createDirectories(logDir);
         } catch (Exception e) {

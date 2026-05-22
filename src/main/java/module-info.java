@@ -8,6 +8,7 @@ module io.github.rikkakawaii0612.classtop {
     requires org.slf4j;
     requires com.fasterxml.jackson.annotation;
     requires com.sun.jna.platform;
+    requires java.management;
 
     opens io.github.rikkakawaii0612.classtop;
     opens io.github.rikkakawaii0612.classtop.util;

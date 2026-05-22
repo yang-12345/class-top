@@ -45,7 +45,10 @@ public class SettingsWindow extends Stage {
         HBox buttonBox = new HBox(10, saveButton, closeButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        root.getChildren().addAll(autoStartCheckbox, buttonBox);
+        //todo: test
+        Label label = new Label(this.config.actualPath);
+
+        root.getChildren().addAll(autoStartCheckbox, buttonBox, label);
 
         Scene scene = new Scene(root, 400, 200);
         setScene(scene);

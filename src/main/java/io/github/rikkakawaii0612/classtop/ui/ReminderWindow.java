@@ -4,14 +4,13 @@ import javafx.animation.*;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -44,6 +43,8 @@ public class ReminderWindow {
     private final Button closeButton;
     private Timeline colorTimeline;
     private Color currentButtonColor = DEFAULT_COLOR; // 维护当前实际颜色
+
+    private final Timeline focuser;
 
 
     public ReminderWindow(Runnable onCloseCallback, Runnable onIgnoreCallback) {
@@ -160,27 +161,24 @@ public class ReminderWindow {
 
         this.parentStage = parentStage;
 
-        stage.focusedProperty().addListener(new ChangeListener<>() {
-            boolean initialized = false;
-
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
-                if (this.initialized && !t1) {
-                    ReminderWindow.this.startCloseAnimation(onIgnoreCallback);
-                }
-                this.initialized = true;
-            }
-        });
-
-        stage.fullScreenProperty().addListener((_, _, newValue) -> {
-            if (!newValue) {
-                ReminderWindow.this.startCloseAnimation(onIgnoreCallback);
-            }
-        });
+        stage.setOnCloseRequest(Event::consume);
 
         // 显示窗口并启动入场动画
         parentStage.show();
         startEntranceAnimation();
+
+        this.focuser = new Timeline(new KeyFrame(Duration.millis(500.0D), _ -> {
+            if (!this.stage.isFocused()) {
+                this.stage.toFront();
+            }
+            if (!this.stage.isFullScreen()) {
+                this.stage.setFullScreen(true);
+            }
+        }));
+        this.focuser.setCycleCount(Timeline.INDEFINITE); // 设置为无限循环
+        this.focuser.play(); // 启动定时器
+
+        this.stage.setOnHiding(_ -> this.focuser.stop());
     }
 
     // 修改 setButtonColor 方法，同时更新 currentButtonColor
